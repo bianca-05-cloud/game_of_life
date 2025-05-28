@@ -168,12 +168,48 @@ This page provides detailed setup steps, usage guidelines, and troubleshooting t
 
 ---
 
-## 📂 File structure and organization
+## 📂 File Structure and Organization
 
-- main.c: THE main part of the program, divided in four tasks using an if function, where variable T represent the number of task; here we applied the functions and we build the actuall program
-- functions.c: all the functions utilised in the program;
-- header.h: declariation of all data structure utillized and functions;
-- 
+- **main.c**  
+  The core of the program. It is divided into four tasks using an `if` function, where the variable `T` represents the task number. This file applies the functions and builds the actual program logic.
+
+- **functions.c**  
+  Contains all the functions used across the program.
+
+- **header.h**  
+  Declares all data structures and function prototypes utilized in the program.
+
+---
+
+### 🔑 Principal Functions
+
+- `int neighbors(char **m, int N, int M, int i, int j)`  
+  Counts the number of **alive neighbors** of a cell.  
+  🧠 *This function has a huge impact on all four tasks.*
+
+- `void add_t2(cell **head, int l, int c)`  
+  Adds a cell to the list of changes and maintains order by row and column.  
+  ➤ *Used in Task 2. The way data structures are stored here is essential for the following tasks.*
+
+- `void create_tree_t3(node *root, list **right_end, list **left_end, int level, int max_k)`  
+  Recursively builds a **binary tree** of depth `max_k`, where each node represents a generation of the Game of Life.  
+  Each step has two evolution variants:
+  - **Left**: evolution according to the modified rule (`left_end`)
+  - **Right**: evolution according to the classic rule (`right_end`)
+
+- `void search_hamiltonian_chains(int **adj, Cell *cells, int *component, int nr_cells, int *nr_components, FILE* out)`  
+  Finds the **longest elementary chain** (a path with no repeated nodes) of living cells in each connected component of the graph formed by living cells and prints it to the file.
+
+---
+
+### ⚠️ Important Notes
+
+- There are **some errors in Task 3 and Task 4**:
+  - The matrix (Task 3) and the Hamiltonian chain (Task 4) are not printed correctly.
+  - The program also has **performance issues**, especially with execution time in later tasks.
+
+- 🛠️ The application **needs further improvements and debugging**.
+
 
 ## 📄 License
 
