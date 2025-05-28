@@ -1,6 +1,6 @@
 #include "header.h"
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
     int T, N, M, K;
 
@@ -138,180 +138,81 @@ int main(int argc, char *argv[])
         afisare_t2(stiva, out);
 
         fclose(out);
+        eliberare_stiva_generatii(stiva);
         eliberare_matrice_t2(m, N);
     }
 
     else if (T == 3)
     {
+        // Creez rădăcina arborelui
+        nod_arbore *radacina = creare_nod();
+    
+        // Pentru rădăcină, modificările sunt celulele vii din matricea inițială
+        for (i = 0; i < N; i++) {
+            for (j = 0; j < M; j++) {
+                if (m[i][j] == 'X') {
+                    adaugare_t2(&(radacina->modificari), i, j);
+                }
+            }
+        }
+        
+        // Construiesc arborele până la nivelul K
+        construire_arbore(radacina, m, 0, K, N, M);
+        
+        // Creez o matrice goală pentru început
         char **matrice_goala = (char **)malloc(N * sizeof(char *));
-        for (int i = 0; i < N; i++)
-        {
+        for (i = 0; i < N; i++) {
             matrice_goala[i] = (char *)malloc(M * sizeof(char));
-            for (int j = 0; j < M; j++)
-            {
-                matrice_goala[i][j] = m[i][j];
+            for (j = 0; j < M; j++) {
+                matrice_goala[i][j] = '+';
             }
         }
-
-        // conversie initiala in lista
-        lista *cap_matrice = matrice_devine_lista_t3(m, matrice_goala, N, M);
-
-        // alocare matrici auxiliare
-        char **q1 = (char **)malloc(N * sizeof(char *)); // GOL normal
-        char **p1 = (char **)malloc(N * sizeof(char *)); // GOL modificat
-        for (int i = 0; i < N; i++)
-        {
-            q1[i] = (char *)malloc(M * sizeof(char));
-            p1[i] = (char *)malloc(M * sizeof(char));
-        }
-
-        // vectorii de liste pentru capete
-        lista **capete_dreapta = (lista **)malloc(K * sizeof(lista *));
-        lista **capete_stanga = (lista **)malloc(K * sizeof(lista *));
-        int k1;
-
-        char **copie_dreapta = (char **)malloc(N * sizeof(char *));
-        char **copie_stanga = (char **)malloc(N * sizeof(char *));
-
-        for (i = 0; i < N; i++)
-        {
-            copie_dreapta[i] = (char *)malloc(M * sizeof(char));
-            copie_stanga[i] = (char *)malloc(M * sizeof(char));
-
-            for (j = 0; j < M; j++)
-            {
-                copie_dreapta[i][j] = m[i][j];
-                copie_stanga[i][j] = m[i][j];
-            }
-        }
-
-                for (k1 = 0; k1 < K; k1++)
-                {
-                    // Actualizare Game of Life normal (dreapta)
-                    actualizare_matrice_dreapta_t3(copie_dreapta, q1, N, M);
-                    capete_dreapta[k1] = matrice_devine_lista_t3(copie_dreapta, q1, N, M);
-                    copie_matrice(q1, copie_dreapta, N, M);
-
-                    // Actualizare Game of Life modificat (stanga)
-                    actualizare_matrice_stanga_t3(copie_stanga, p1, N, M);
-                    capete_stanga[k1] = matrice_devine_lista_t3(copie_stanga, p1, N, M);
-                    copie_matrice(p1, copie_stanga, N, M);
-                }
-            
         
-
-        // radacina arbore
-        node *root = (node *)malloc(sizeof(node));
-        root->left = root->right = NULL;
-        root->val = cap_matrice;
-
-        creeare_arbore_t3(root, capete_dreapta, capete_stanga, 0, K);
-
-        // matrice temporara pt reconstructie
-        char **matrice_output = (char **)malloc(N * sizeof(char *));
-        for (i = 0; i < N; i++)
-            matrice_output[i] = (char *)malloc(M * sizeof(char));
-        copie_matrice(m, matrice_output, N, M);
-        preordine_t3(root, matrice_output, N, M, out, 0);
+        // Parcurg arborele în preordine și afișez matricile
+        parcurgere_preordine(radacina, matrice_goala, N, M, out);
+        
+        // Eliberez memoria
+        eliberare_matrice_t2(matrice_goala, N);
+        eliberare_arbore(radacina);
         
         fclose(out);
-
-        for (i = 0; i < N; i++)
-        {
-
-            free(q1[i]);
-            free(p1[i]);
-            free(matrice_output[i]);
-        }
-
-        free(q1);
-        free(p1);
-        free(matrice_output);
-        for (int i = 0; i < N; i++)
-            free(matrice_goala[i]);
-        free(matrice_goala);
+        
     }
-
-    else if (T == 4)
-    {       char **matrice_goala = (char **)malloc(N * sizeof(char *));
-            for (int i = 0; i < N; i++)
-            {
-                matrice_goala[i] = (char *)malloc(M * sizeof(char));
-                for (int j = 0; j < M; j++)
-                {
-                    matrice_goala[i][j] = '+'; // toți morți
-                }
-            }
-
-            // conversie initiala in lista
-            lista *cap_matrice = matrice_devine_lista_t3(matrice_goala, m, N, M);
-
-            // alocare matrici auxiliare
-            char **q1 = (char **)malloc(N * sizeof(char *)); // GOL normal
-            char **p1 = (char **)malloc(N * sizeof(char *)); // GOL modificat
-            for (int i = 0; i < N; i++)
-            {
-                q1[i] = (char *)malloc(M * sizeof(char));
-                p1[i] = (char *)malloc(M * sizeof(char));
-            }
-
-            // vectorii de liste pentru capete
-            lista **capete_dreapta = (lista **)malloc(K * sizeof(lista *));
-            lista **capete_stanga = (lista **)malloc(K * sizeof(lista *));
-            int k1;
-
-            char **copie_dreapta = (char **)malloc(N * sizeof(char *));
-            char **copie_stanga = (char **)malloc(N * sizeof(char *));
-
-            for (i = 0; i < N; i++)
-            {
-                copie_dreapta[i] = (char *)malloc(M * sizeof(char));
-                copie_stanga[i] = (char *)malloc(M * sizeof(char));
-
-                for (j = 0; j < M; j++)
-                {
-                    copie_dreapta[i][j] = m[i][j];
-                    copie_stanga[i][j] = m[i][j];
-                }
-            }
-
-            for (k1 = 0; k1 < K; k1++)
-            {
-                // Actualizare Game of Life normal (dreapta)
-                actualizare_matrice_dreapta_t3(copie_dreapta, q1, N, M);
-                capete_dreapta[k1] = matrice_devine_lista_t3(copie_dreapta, q1, N, M);
-
-                for (i = 0; i < N; i++)
-                    for (j = 0; j < M; j++)
-                        copie_dreapta[i][j] = q1[i][j];
-
-                // Actualizare Game of Life modificat (stanga)
-                actualizare_matrice_stanga_t3(copie_stanga, p1, N, M);
-                capete_stanga[k1] = matrice_devine_lista_t3(copie_stanga, p1, N, M);
-
-                for (i = 0; i < N; i++)
-                    for (j = 0; j < M; j++)
-                        copie_stanga[i][j] = p1[i][j];
-            }
-
-        node *root = (node *)malloc(sizeof(node));
-            root->left = root->right = NULL;
-            root->val = cap_matrice;
-
-            creeare_arbore_t3(root, capete_dreapta, capete_stanga, 0, K);
-
-        char **matrice_generatie = (char **)malloc(N * sizeof(char *));
-        for (int i = 0; i < N; i++)
-            matrice_generatie[i] = (char *)malloc(M * sizeof(char));
-
-        preordine_task4(root, matrice_generatie, N, M, out, 0);
-
-        for (int i = 0; i < N; i++)
-            free(matrice_generatie[i]);
-        free(matrice_generatie);
-        fclose(out);
-    }
-
+    // else if (T == 4) {
+    //     // Creez arborele la fel ca la Task 3
+    //     nod_arbore *radacina = creare_nod();
+        
+    //     // Pentru rădăcină, modificările sunt celulele vii din matricea inițială
+    //     for (i = 0; i < N; i++) {
+    //         for (j = 0; j < M; j++) {
+    //             if (m[i][j] == 'X') {
+    //                 adaugare_t2(&(radacina->modificari), i, j);
+    //             }
+    //         }
+    //     }
+        
+    //     // Construiesc arborele până la nivelul K
+    //     construire_arbore(radacina, m, 0, K, N, M);
+        
+    //     // Creez o matrice goală pentru început
+    //     char **matrice_goala = (char **)malloc(N * sizeof(char *));
+    //     for (i = 0; i < N; i++) {
+    //         matrice_goala[i] = (char *)malloc(M * sizeof(char));
+    //         for (j = 0; j < M; j++) {
+    //             matrice_goala[i][j] = '+';
+    //         }
+    //     }
+        
+    //     // Procesez arborele și găsesc lanțurile Hamiltoniene
+    //     procesare_arbore_task4(radacina, matrice_goala, N, M, out, 0);
+        
+    //     // Eliberez memoria
+    //     eliberare_matrice_t2(matrice_goala, N);
+    //     eliberare_arbore(radacina);
+        
+    //     fclose(out);
+    // }
+    
     for (i = 0; i < N; i++)
     {
         free(m[i]);
