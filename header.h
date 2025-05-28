@@ -39,67 +39,39 @@ char **copie_t2(char **m, int N, int M);
 void eliberare_matrice_t2(char **m, int N);
 void afisare_t2(generatie *stiva, FILE *out);
 
-// t3
+void eliberare_lista_celule(celula *head);
+void eliberare_stiva_generatii(generatie *stiva);
 
-struct coordonate // structura prin intermediul careia vreau sa salvez coordonatele pe care le modifica jocul
-                  // acestea sunt coordonatele pe care le salvez in lista/liste care se salveaza in nodurile arborelui
-{
-    int l;
-    int c;
+// Structura pentru nodul arborelui binar
+struct nod_arbore {
+    celula *modificari;         // lista de celule modificate față de părinte
+    struct nod_arbore *stanga;  // regula B
+    struct nod_arbore *dreapta; // reguli standard
 };
+typedef struct nod_arbore nod_arbore;
 
-typedef struct coordonate coordonate;
+// Funcții pentru Task 3
+void aplicare_regula_B(char **m, char **nou, int N, int M, celula **modificari);
+void construire_arbore(nod_arbore *nod_curent, char **matrice_curenta, int nivel_curent, int K, int N, int M);
+void parcurgere_preordine(nod_arbore *nod, char **matrice_curenta, int N, int M, FILE *out);
+void reconstituire_matrice(char **matrice, celula *modificari, int N, int M);
+nod_arbore* creare_nod();
+void eliberare_arbore(nod_arbore *nod);
+char **copiere_matrice(char **m, int N, int M);
 
-struct lista // structura definita ptr a fi salvata in nodurile arborelui pe care dorim sa-l creeam
-{
-    coordonate x;
-    struct lista *next;
-};
+// // Structură pentru reprezentarea unui nod din graf
+// struct nod_graf {
+//     int linie;
+//     int coloana;
+//     int index;  // index în graf (0, 1, 2, ...)
+// };
+// typedef struct nod_graf nod_graf;
 
-typedef struct lista lista;
-
-struct tree
-{
-    lista *val;
-    struct tree *left;
-    struct tree *right;
-};
-
-typedef struct tree node;
-
-void adaugare_la_inceput_t3(lista **cap_matrice, int i, int j);
-void adaugare_la_final_t3(lista **cap_matrice, int i, int j);
-lista *matrice_devine_lista_t3(char **veche, char **noua, int N, int M);
-int vecinii_t3(char **m, int N, int M, int i, int j);
-void actualizare_matrice_dreapta_t3(char **m, char **q, int N, int M);
-void actualizare_matrice_stanga_t3(char **m, char **p, int N, int M);
-void creeare_arbore_t3(node *root, lista **capete_dreapta, lista **capete_stanga, int nivel, int max_k);
-void trecere_din_lista_in_matrice_t3(lista *cap, char **m, int N, int M);
-void copie_matrice(char **sursa, char **dest, int N, int M);
-void preordine_t3(node *root, char **m, int N, int M, FILE *out, int nivel);
-
-// task4
-
-
-typedef struct {
-    int linie;
-    int coloana;
-} Celula;
-
-typedef struct {
-    int n; // număr de celule vii
-    Celula *celule; // vector de celule vii
-    int **adj; // matrice de adiacență
-} Graf;
-
-void extrage_celule_vii(char **m, int N, int M, Celula **celule, int *nr_celule);
-int **construieste_matrice_adiacenta(Celula *celule, int nr_celule);
-void gaseste_componente_conexe(int **adj, Celula *celule, int nr_celule, int *componenta, int *nr_componente);
-int compara_lanturi(Celula* celule, int* drum1, int* drum2, int lungime);
-void backtrack(int** adj, Celula* celule, int* noduri, int dim, int poz, int* vizitat, int* drum_curent, int lungime,int* drum_max, int* lungime_max);
-void cauta_lanturi_hamiltoniene(int** adj, Celula* celule, int* componenta, int nr_celule, int* nr_componente, FILE* out);
-void afiseaza_lant(FILE *out, Celula *celule, int *drum, int lungime);
-void preordine_task4(node *root, char **matrice_generatie, int N, int M, FILE *out, int nivel);
-void afisare_lista_t3(lista *cap);
-void afisare_node_t3(node *n);
-void afisare_matrice_t3(char **m, int N, int M);
+// // Funcții pentru Task 4
+// int sunt_vecine(int l1, int c1, int l2, int c2);
+// void construire_graf(char **matrice, int N, int M, nod_graf **noduri, int *nr_noduri, int **matrice_adiacenta);
+// void gaseste_lant_hamiltonian(int **matrice_adiacenta, int nr_noduri, int *lant_maxim, int *lungime_maxima, nod_graf *noduri);
+// void backtrack_hamiltonian(int **matrice_adiacenta, int nr_noduri, int *lant_curent, int *vizitat, int pozitie, int *lant_maxim, int *lungime_maxima, nod_graf *noduri);
+// int compara_lanturi(int *lant1, int *lant2, int lungime, nod_graf *noduri);
+// void procesare_arbore_task4(nod_arbore *nod, char **matrice_curenta, int N, int M, FILE *out, int nivel);
+// void eliberare_matrice_int(int **matrice, int n);
