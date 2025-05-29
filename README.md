@@ -191,21 +191,21 @@ This page provides detailed setup steps, usage guidelines, and troubleshooting t
   Adds a cell to the list of changes and maintains order by row and column.  
   ➤ *Used in Task 2. The way data structures are stored here is essential for the following tasks.*
 
-- `void create_tree_t3(node *root, list **right_end, list **left_end, int level, int max_k)`  
+- `void build_tree(tree_node *current_node, char **current_matrix, int current_level, int K, int N, int M)`  
   Recursively builds a **binary tree** of depth `max_k`, where each node represents a generation of the Game of Life.  
   Each step has two evolution variants:
   - **Left**: evolution according to the modified rule (`left_end`)
   - **Right**: evolution according to the classic rule (`right_end`)
 
-- `void search_hamiltonian_chains(int **adj, Cell *cells, int *component, int nr_cells, int *nr_components, FILE* out)`  
+- `void find_hamiltonian_chain(int **adjacency_matrix, int node_count, int *max_chain, int *max_length, graph_node *nodes)`  
   Finds the **longest elementary chain** (a path with no repeated nodes) of living cells in each connected component of the graph formed by living cells and prints it to the file.
 
 ---
 
 ### ⚠️ Important Notes
 
-- There are **some errors in Task 3 and Task 4**:
-  - The matrix (Task 3) and the Hamiltonian chain (Task 4) are not printed correctly.
+- There are **some errors in Task 4**:
+  - The Hamiltonian chain (Task 4) are not printed correctly.
   - The program also has **performance issues**, especially with execution time in later tasks.
 
 - 🛠️ The application **needs further improvements and debugging**.
