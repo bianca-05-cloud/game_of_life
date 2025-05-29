@@ -50,9 +50,6 @@ int main(int argc, const char *argv[])
             q[i] = (char *)malloc(M * sizeof(char));
         }
 
-        // citire_matrice(m, in, N, M);  // citim matricea inițială
-        // fclose(in);
-
         // Rulez jocul pentru K generații
         for (k = 0; k <= K; k++)
         {
@@ -78,11 +75,11 @@ int main(int argc, const char *argv[])
         // Eliberăm memoria alocată
         for (i = 0; i < N; i++)
         {
-            // free(m[i]);
+           
             free(q[i]);
         }
 
-        // free(m);
+        
         free(q);
     }
 
@@ -96,7 +93,7 @@ int main(int argc, const char *argv[])
         // rulez ptr K generatii
         for (k = 1; k <= K; k++)
         {
-            char **nou = copie_t2(m, N, M);
+            char **nou = copie_t2(m, N, M); // Creez o copie a matricei curente pentru a calcula noua generație
             celula *mode = NULL; // pointer catre inceputul unei liste de tip celula
                                  // aceasta lista va contine toate celulele care s au modificat intr o anumita generatie
                                  //=lista modificari pentru generatia curenta
@@ -107,7 +104,7 @@ int main(int argc, const char *argv[])
                     int vecini = vecinii(m, N, M, i, j); // calc vecinii
 
                     if ((m[i][j] == 'X' && (vecini < 2 || vecini > 3)) || (m[i][j] == '+' && vecini == 3)) // aplic regulile din GOL
-                    {
+                    {   // Inversez starea celulei în matricea nouă
                         nou[i][j] = (m[i][j] == 'X') ? '+' : 'X'; // transf GOL
                         adaugare_t2(&mode, i, j);                 // creeaza un nod nou cu coord i, j si adauga acel nod in lista
                         // printf("Modificare: (%d, %d)\n", i, j); // DEBUG
