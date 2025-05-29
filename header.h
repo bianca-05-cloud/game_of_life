@@ -42,6 +42,7 @@ void afisare_t2(generatie *stiva, FILE *out);
 void eliberare_lista_celule(celula *head);
 void eliberare_stiva_generatii(generatie *stiva);
 
+//t3
 // Structura pentru nodul arborelui binar
 struct nod_arbore {
     celula *modificari;         // lista de celule modificate față de părinte
@@ -59,6 +60,8 @@ nod_arbore* creare_nod();
 void eliberare_arbore(nod_arbore *nod);
 char **copiere_matrice(char **m, int N, int M);
 
+
+//t4
 // // Structură pentru reprezentarea unui nod din graf
 // struct nod_graf {
 //     int linie;
