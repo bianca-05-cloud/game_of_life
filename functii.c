@@ -103,6 +103,10 @@ void adaugare_t2(celula **head, int l, int c)
     new->c = c;
     new->next = NULL;
 
+
+    // Dacă lista este goală SAU noua celulă trebuie pusă înaintea capului (are linie mai mică
+    // sau aceeași linie dar coloană mai mică), inserează la început
+
     if (*head == NULL || l < (*head)->l || (l == (*head)->l && c < (*head)->c))
 
     {
@@ -110,6 +114,8 @@ void adaugare_t2(celula **head, int l, int c)
         *head = new;       // actualizeaza head
         return;
     }
+    
+    // Altfel, caută poziția corectă pentru inserare astfel încât lista să rămână ordonată
 
     celula *curent = *head;
     while (curent->next && (curent->next->l < l || (curent->next->l == l && curent->next->c < c)))
@@ -189,6 +195,10 @@ void eliberare_stiva_generatii(generatie *stiva)
         free(temp);                      // eliberează nodul stivă
     }
 }
+
+
+//task 3
+
 
 // Funcție pentru aplicarea regulii B (celulă cu exact 2 vecini vii devine vie)
 void aplicare_regula_B(char **m, char **nou, int N, int M, celula **modificari)
