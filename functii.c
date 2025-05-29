@@ -266,14 +266,18 @@ void construire_arbore(nod_arbore *nod_curent, char **matrice_curenta, int nivel
     }
 
     // Creez matrici auxiliare pentru cele două ramuri
-    char **matrice_stanga = copiere_matrice(matrice_curenta, N, M);
-    char **matrice_dreapta = copiere_matrice(matrice_curenta, N, M);
-    char **temp_stanga = copiere_matrice(matrice_curenta, N, M);
+    char **matrice_stanga = copiere_matrice(matrice_curenta, N, M); // pentru ramura stângă (regula B)
+    char **matrice_dreapta = copiere_matrice(matrice_curenta, N, M); // pentru ramura dreaptă (reguli standard)
+    char **temp_stanga = copiere_matrice(matrice_curenta, N, M); // (nu sunt folosite efectiv aici, pot fi eliminate)
     char **temp_dreapta = copiere_matrice(matrice_curenta, N, M);
 
     // Creez nodurile pentru stânga și dreapta
     nod_curent->stanga = creare_nod();
     nod_curent->dreapta = creare_nod();
+
+    // Aplic regula B (celulă cu exact 2 vecini vii devine vie) pentru ramura stângă
+    // și salvez modificările în lista nodului stânga
+    // Aplic regulile standard Game of Life pentru ramura dreaptă
 
     // Aplic regula B pentru ramura stângă
     aplicare_regula_B(matrice_curenta, matrice_stanga, N, M, &(nod_curent->stanga->modificari));
@@ -387,20 +391,21 @@ void eliberare_arbore(nod_arbore *nod)
 
 
 //Functii task 4
-// // Verifică dacă două celule sunt vecine (8-vecini)
+// Verifică dacă două celule sunt vecine (8-vecini)
 // int sunt_vecine(int l1, int c1, int l2, int c2)
 // {
-//     int dl = abs(l1 - l2);
-//     int dc = abs(c1 - c2);
+//     int dl = abs(l1 - l2); // diferența pe linii
+//     int dc = abs(c1 - c2); // diferența pe coloane
+//     // Sunt vecine dacă sunt la distanță maxim 1 pe ambele axe, dar nu sunt aceeași celulă
 //     return (dl <= 1 && dc <= 1 && !(dl == 0 && dc == 0));
 // }
 
 // // Construiește graful din celulele vii
 // void construire_graf(char **matrice, int N, int M, nod_graf **noduri, int *nr_noduri, int **matrice_adiacenta)
 // {
-//     *nr_noduri = 0;
+//     *nr_noduri = 0; // inițializez numărul de noduri
 
-//     // Numără celulele vii și creează nodurile
+//     // Număr celulele vii și creez nodurile
 //     int i, j;
 //     for (i = 0; i < N; i++)
 //     {
@@ -408,21 +413,22 @@ void eliberare_arbore(nod_arbore *nod)
 //         {
 //             if (matrice[i][j] == 'X')
 //             {
-//                 (*nr_noduri)++;
+//                 (*nr_noduri)++; // cresc contorul pentru fiecare celulă vie
 //             }
 //         }
 //     }
 
+//     // Dacă nu există celule vii, nu creez graf
 //     if (*nr_noduri == 0)
 //     {
 //         *noduri = NULL;
 //         return;
 //     }
 
-//     // Alocă memorie pentru noduri
+//     // Aloc memorie pentru vectorul de noduri
 //     *noduri = (nod_graf *)malloc((*nr_noduri) * sizeof(nod_graf));
 
-//     // Populează array-ul de noduri
+//     // Populez vectorul de noduri cu coordonatele celulelor vii
 //     int index = 0;
 //     for (i = 0; i < N; i++)
 //     {
@@ -438,13 +444,13 @@ void eliberare_arbore(nod_arbore *nod)
 //         }
 //     }
 
-//     // Alocă și inițializează matricea de adiacență
+//     // Aloc și initializez matricea de adiacență (cu 0)
 //     for (i = 0; i < *nr_noduri; i++)
 //     {
 //         matrice_adiacenta[i] = (int *)calloc(*nr_noduri, sizeof(int));
 //     }
 
-//     // Construiește matricea de adiacență
+//     // Construiesc matricea de adiacență: pun 1 dacă două celule sunt vecine
 //     for (i = 0; i < *nr_noduri; i++)
 //     {
 //         for (j = i + 1; j < *nr_noduri; j++)
@@ -453,7 +459,7 @@ void eliberare_arbore(nod_arbore *nod)
 //                             (*noduri)[j].linie, (*noduri)[j].coloana))
 //             {
 //                 matrice_adiacenta[i][j] = 1;
-//                 matrice_adiacenta[j][i] = 1;
+//                 matrice_adiacenta[j][i] = 1; // graful este neorientat
 //             }
 //         }
 //     }
@@ -470,25 +476,26 @@ void eliberare_arbore(nod_arbore *nod)
 //         int l2 = noduri[lant2[i]].linie;
 //         int c2 = noduri[lant2[i]].coloana;
 
-//         // Compară mai întâi linia
+//         // Compar linia
 //         if (l1 < l2)
 //             return -1; // lant1 e mai bun
 //         if (l1 > l2)
 //             return 1; // lant2 e mai bun
 
-//         // Dacă liniile sunt egale, compară coloana
+//         // Dacă liniile sunt egale, compar coloana
 //         if (c1 < c2)
 //             return -1; // lant1 e mai bun
 //         if (c1 > c2)
 //             return 1; // lant2 e mai bun
 //     }
-//     return 0; // identice
+//     return 0; // drumurile sunt identice
 // }
 
+// // Optimizează lanțul: rotește astfel încât celula cu linia/coloana minimă să fie prima
 // void optimizeaza_lant(int *lant, int lungime, nod_graf *noduri) {
 //     if (lungime < 1) return;
-    
-//     // Găsește poziția nodului minim în lanț
+
+//     // Găsesc poziția nodului minim (după linie, apoi coloană)
 //     int min_pos = 0;
 //     int i;
 //     for (i = 1; i <= lungime; i++) {
@@ -498,23 +505,23 @@ void eliberare_arbore(nod_arbore *nod)
 //             min_pos = i;
 //         }
 //     }
-    
-//     // Dacă minimul nu e la început, rotește lanțul
+
+//     // Dacă minimul nu e la început, rotesc lanțul astfel încât să fie primul
 //     if (min_pos > 0) {
 //         int *temp = (int *)malloc((lungime + 1) * sizeof(int));
-        
-//         // Verifică direcția optimă
+
+//         // Verific direcția optimă (înainte sau înapoi)
 //         int next = (min_pos + 1) % (lungime + 1);
 //         int prev = (min_pos - 1 + lungime + 1) % (lungime + 1);
-        
+
 //         int forward = 1;
 //         if (noduri[lant[prev]].linie < noduri[lant[next]].linie ||
 //             (noduri[lant[prev]].linie == noduri[lant[next]].linie &&
 //              noduri[lant[prev]].coloana < noduri[lant[next]].coloana)) {
 //             forward = 0;
 //         }
-        
-//         // Rotește în direcția corectă
+
+//         // Rotez în direcția corectă
 //         if (forward) {
 //             for (i = 0; i <= lungime; i++) {
 //                 temp[i] = lant[(min_pos + i) % (lungime + 1)];
@@ -524,27 +531,28 @@ void eliberare_arbore(nod_arbore *nod)
 //                 temp[i] = lant[(min_pos - i + lungime + 1) % (lungime + 1)];
 //             }
 //         }
-        
+
 //         memcpy(lant, temp, (lungime + 1) * sizeof(int));
 //         free(temp);
 //     }
 // }
 
+// // Variabile pentru limitarea apelurilor recursive (protecție la grafuri mari)
 // static int backtrack_calls = 0;
 // static const int MAX_BACKTRACK_CALLS = 100000; // Limită pentru numărul de apeluri
 
-// // Backtracking pentru găsirea lanțului Hamiltonian
+// // Backtracking pentru găsirea lanțului Hamiltonian maxim
 // void backtrack_hamiltonian(int **matrice_adiacenta, int nr_noduri, int *lant_curent,
 //                            int *vizitat, int pozitie, int *lant_maxim, int *lungime_maxima,
 //                            nod_graf *noduri)
 // {
-//     // Verifică limita de apeluri
+//     // Verific dacă am depășit limita de apeluri (protecție la grafuri mari)
 //     if (++backtrack_calls > MAX_BACKTRACK_CALLS)
 //     {
 //         return;
 //     }
 
-//     // Verifică dacă am găsit un lanț mai lung
+//     // Dacă am găsit un lanț mai lung, îl salvez ca lanț maxim
 //     if (pozitie > *lungime_maxima)
 //     {
 //         *lungime_maxima = pozitie;
@@ -554,9 +562,9 @@ void eliberare_arbore(nod_arbore *nod)
 //             lant_maxim[i] = lant_curent[i];
 //         }
 //     }
+//     // Dacă am găsit un lanț de aceeași lungime, aleg cel cu prioritizare mai bună
 //     else if (pozitie == *lungime_maxima && pozitie > 0)
 //     {
-//         // Verifică dacă noul lanț este mai bun conform regulilor
 //         if (compara_lanturi(lant_curent, lant_maxim, pozitie, noduri) < 0)
 //         {
 //             int i;
@@ -567,26 +575,27 @@ void eliberare_arbore(nod_arbore *nod)
 //         }
 //     }
 
-//     // Optimizare: dacă am găsit deja un lanț Hamiltonian complet, nu mai căutăm
+//     // Dacă am găsit deja un lanț Hamiltonian complet, opresc căutarea
 //     if (*lungime_maxima == nr_noduri - 1)
 //     {
 //         return;
 //     }
 
-//     // Creează un array de noduri nevizitate sortate după coordonate
+//     // Creez un array cu nodurile nevizitate, sortate după coordonate
 //     int *candidati = (int *)malloc(nr_noduri * sizeof(int));
 //     int nr_candidati = 0;
 
 //     int i;
 //     for (i = 0; i < nr_noduri; i++)
 //     {
+//         // Adaug ca și candidat orice nod nevizitat, adiacent cu ultimul din lanț (sau orice dacă e primul)
 //         if (!vizitat[i] && (pozitie == 0 || matrice_adiacenta[lant_curent[pozitie]][i]))
 //         {
 //             candidati[nr_candidati++] = i;
 //         }
 //     }
 
-//     // Sortează candidații după coordonate
+//     // Sortez candidații după coordonate (linie, apoi coloană)
 //     int j;
 //     for (i = 0; i < nr_candidati - 1; i++)
 //     {
@@ -603,38 +612,38 @@ void eliberare_arbore(nod_arbore *nod)
 //         }
 //     }
 
-//     // Încearcă candidații în ordinea sortată
+//     // Încerc fiecare candidat, extinzând lanțul
 //     for (i = 0; i < nr_candidati; i++)
 //     {
 //         int next_node = candidati[i];
-//         vizitat[next_node] = 1;
-//         lant_curent[pozitie + 1] = next_node;
+//         vizitat[next_node] = 1; // marchez ca vizitat
+//         lant_curent[pozitie + 1] = next_node; // adaug la lanț
 //         backtrack_hamiltonian(matrice_adiacenta, nr_noduri, lant_curent, vizitat,
 //                               pozitie + 1, lant_maxim, lungime_maxima, noduri);
-//         vizitat[next_node] = 0;
+//         vizitat[next_node] = 0; // backtrack: demarchez
 //     }
 
-//     free(candidati);
+//     free(candidati); // eliberez memoria pentru candidați
 // }
 
-// // Găsește cel mai lung lanț Hamiltonian
+// // Găsește cel mai lung lanț Hamiltonian în graf
 // void gaseste_lant_hamiltonian(int **matrice_adiacenta, int nr_noduri, int *lant_maxim,
 //                               int *lungime_maxima, nod_graf *noduri)
 // {
 //     if (nr_noduri == 0)
 //     {
-//         *lungime_maxima = -1;
+//         *lungime_maxima = -1; // nu există drum
 //         return;
 //     }
 
 //     *lungime_maxima = -1;
-//     int *lant_curent = (int *)malloc((nr_noduri + 1) * sizeof(int));
-//     int *vizitat = (int *)calloc(nr_noduri, sizeof(int));
+//     int *lant_curent = (int *)malloc((nr_noduri + 1) * sizeof(int)); // lanțul curent
+//     int *vizitat = (int *)calloc(nr_noduri, sizeof(int)); // vector de vizitare
 
-//     // Resetează contorul pentru fiecare căutare nouă
+//     // Resetez contorul de apeluri pentru fiecare căutare nouă
 //     backtrack_calls = 0;
 
-//     // Creează un array de indici sortați după coordonate (linie, apoi coloană)
+//     // Creez un array de indici sortați după coordonate (linie, apoi coloană)
 //     int *indici_sortati = (int *)malloc(nr_noduri * sizeof(int));
 //     int i, j;
 //     for (i = 0; i < nr_noduri; i++)
@@ -642,7 +651,7 @@ void eliberare_arbore(nod_arbore *nod)
 //         indici_sortati[i] = i;
 //     }
 
-//     // Sortează indicii după coordonatele nodurilor
+//     // Sortez indicii după coordonatele nodurilor
 //     for (i = 0; i < nr_noduri - 1; i++)
 //     {
 //         for (j = i + 1; j < nr_noduri; j++)
@@ -658,7 +667,7 @@ void eliberare_arbore(nod_arbore *nod)
 //         }
 //     }
 
-//     // Încearcă să pornească din fiecare nod în ordinea sortată
+//     // Încerc să pornesc din fiecare nod, în ordinea sortată
 //     for (i = 0; i < nr_noduri; i++)
 //     {
 //         int start_node = indici_sortati[i];
@@ -668,13 +677,13 @@ void eliberare_arbore(nod_arbore *nod)
 //                               0, lant_maxim, lungime_maxima, noduri);
 //         vizitat[start_node] = 0;
 
-//         // Dacă am depășit limita de apeluri, ieșim
+//         // Dacă am depășit limita de apeluri, ies
 //         if (backtrack_calls > MAX_BACKTRACK_CALLS)
 //         {
 //             break;
 //         }
 
-//         // Dacă am găsit un lanț Hamiltonian complet, nu mai căutăm
+//         // Dacă am găsit un lanț Hamiltonian complet, nu mai caut
 //         if (*lungime_maxima == nr_noduri - 1)
 //         {
 //             break;
@@ -686,28 +695,28 @@ void eliberare_arbore(nod_arbore *nod)
 //     free(indici_sortati);
 // }
 
-// // Procesarea arborelui pentru Task 4
+// // Procesarea arborelui pentru Task 4: pentru fiecare generație, caută lanțul Hamiltonian maxim
 // void procesare_arbore_task4(nod_arbore *nod, char **matrice_curenta, int N, int M, FILE *out, int nivel)
 // {
 //     if (nod == NULL)
 //     {
-//         return;
+//         return; // condiție de oprire recursivitate
 //     }
 
-//     // Reconstituie matricea pentru nodul curent
+//     // Reconstituie matricea pentru nodul curent (aplică modificările)
 //     char **matrice_nod = copiere_matrice(matrice_curenta, N, M);
 //     reconstituire_matrice(matrice_nod, nod->modificari, N, M);
 
-//     // Construiește graful
+//     // Construiește graful pe baza matricei curente
 //     nod_graf *noduri_graf = NULL;
 //     int nr_noduri = 0;
 
-//     // Alocăm matrice de adiacență pentru cel mult N*M noduri
+//     // Aloc matrice de adiacență pentru maxim N*M noduri (mai mult decât e nevoie, dar sigur)
 //     int **matrice_adiacenta = (int **)malloc(N * M * sizeof(int *));
 
 //     construire_graf(matrice_nod, N, M, &noduri_graf, &nr_noduri, matrice_adiacenta);
 
-//     // Găsește cel mai lung lanț Hamiltonian
+//     // Găsesc cel mai lung lanț Hamiltonian
 //     int *lant_maxim = (int *)malloc((nr_noduri + 1) * sizeof(int));
 //     int lungime_maxima = -1;
 
@@ -716,7 +725,7 @@ void eliberare_arbore(nod_arbore *nod)
 //         gaseste_lant_hamiltonian(matrice_adiacenta, nr_noduri, lant_maxim, &lungime_maxima, noduri_graf);
 
 //         if (lungime_maxima >= 0) {
-//             optimizeaza_lant(lant_maxim, lungime_maxima, noduri_graf);
+//             optimizeaza_lant(lant_maxim, lungime_maxima, noduri_graf); // rotesc lanțul pentru afișare
 //         }
 //     }
 //     else if (nr_noduri > 50)
@@ -725,7 +734,7 @@ void eliberare_arbore(nod_arbore *nod)
 //         lungime_maxima = -1;
 //     }
 
-//     // Afișează rezultatul
+//     // Afișez rezultatul în fișier
 //     fprintf(out, "%d\n", lungime_maxima);
 //     if (lungime_maxima >= 0)
 //     {
@@ -742,7 +751,7 @@ void eliberare_arbore(nod_arbore *nod)
 //         fprintf(out, "\n");
 //     }
 
-//     // Eliberează memoria pentru graf
+//     // Eliberez memoria pentru graf
 //     if (noduri_graf)
 //     {
 //         free(noduri_graf);
@@ -750,7 +759,7 @@ void eliberare_arbore(nod_arbore *nod)
 //     free(lant_maxim);
 //     eliberare_matrice_int(matrice_adiacenta, nr_noduri > 0 ? nr_noduri : N * M);
 
-//     // Procesează recursiv copiii
+//     // Procesez recursiv copiii (stânga și dreapta)
 //     if (nod->stanga)
 //     {
 //         procesare_arbore_task4(nod->stanga, matrice_nod, N, M, out, nivel + 1);
@@ -763,6 +772,7 @@ void eliberare_arbore(nod_arbore *nod)
 //     eliberare_matrice_t2(matrice_nod, N);
 // }
 
+// // Eliberează o matrice de int-uri (folosită pentru matricea de adiacență)
 // void eliberare_matrice_int(int **matrice, int n)
 // {
 //     if (matrice == NULL)
